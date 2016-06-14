@@ -6,6 +6,7 @@
 package producerconsumer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
@@ -15,26 +16,19 @@ import java.util.logging.Logger;
  *
  * @author butwhole
  */
-public class S1 extends Thread {
+public class S1 {
 
-    private ArrayBlockingQueue<Long> q = new ArrayBlockingQueue(20);
-    private ArrayBlockingQueue<Long> s1 = new ArrayBlockingQueue(20);
-    private int Threads;
+    private static ArrayBlockingQueue<Long> q = new ArrayBlockingQueue(100);
+    private static ArrayBlockingQueue<Long> s1 = new ArrayBlockingQueue(100);
 
-    public S1(Long[] list ,int Threads) {
-        for (Long m : list) {
-            q.add(m);
-        }
-        this.Threads = Threads;
+    public static long run(Long[] list, int Threads) {
+        long start = System.nanoTime() / 1000_000_0;
+        q.addAll(Arrays.asList(list));
+        List<P> ThreadList = new ArrayList();
 
-    }
-
-    public void run() {
-        List<P> list = new ArrayList();
-        long start = System.nanoTime();
         for (int i = 0; i < Threads; i++) {
-            list.add(new P(q, s1));
-            list.get(i).start();
+            ThreadList.add(new P(q, s1));
+            ThreadList.get(i).start();
 
         }
         C1 c1 = new C1(s1);
@@ -42,27 +36,33 @@ public class S1 extends Thread {
 
         for (int i = 0; i < Threads; i++) {
             try {
-                list.get(i).join();
+                ThreadList.get(i).join();
             } catch (InterruptedException ex) {
                 Logger.getLogger(S1.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        long end = System.nanoTime();
+        long end = System.nanoTime() / 1000_000_0;
         c1.setRun(false);
         System.out.println("sum is: " + c1.getSum());
-        System.out.println("Time taken: " + (end-start));
+        System.out.println("Time taken: " + (end - start));
         try {
             s1.put(0L);
         } catch (InterruptedException ex) {
             Logger.getLogger(S1.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        return end-start;
     }
 
     public static void main(String[] args) {
-        Long[] list = {4L, 5L, 8L, 12L, 21L, 22L, 34L, 35L, 36L, 37L, 42L,};
-        S1 s1 = new S1(list,3);
-        s1.start();
+        Long[] list = {1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 21L, 22L, 34L, 35L, 36L, 37L, 38L, 39L, 40L, 41L, 42L};
+        ArrayList<Long> res = new ArrayList();
+        for (int i = 0; i < 8; i++) {
+            res.add(run(list,i));
+        }
+        for (int i = 0; i < 8; i++) {
+            System.out.println("Time Taken (s"+i+"): " + res.get(i));
+        }
+        
 
     }
 

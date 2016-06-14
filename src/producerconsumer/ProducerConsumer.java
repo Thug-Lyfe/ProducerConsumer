@@ -13,12 +13,6 @@ import java.util.concurrent.ArrayBlockingQueue;
  * @author butwhole
  */
 public class ProducerConsumer {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        
-    }
+// run the S1 method
     
 }
